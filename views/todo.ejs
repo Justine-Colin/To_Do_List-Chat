@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Ma todolist</title>
+        <style>
+            html {background-color: rgb(64, 64, 64); color: white; font-family: 'Segoe Print','Bookman';}
+            a {text-decoration: none; color: red;}
+            ul {list-style: none;}
+        </style>
+    </head>
+
+    <body>
+        <h1>Ma todolist</h1>
+
+        <ul>
+        <% todolist.forEach(function(todo, index) { %>
+            <li> <!--Utilisation de span pour séparer la croix du texte => possible d'éditer-->
+                <span><a href="/todo/supprimer/<%= index %>">✘</a></span> <!--Croix pour la suppression-->
+                <span contentEditable="true" id="changement" onchange="Itemchange(<%=index%>)"><%= todo %></span> <!--Elément qu'on peut modifier-->
+            </li>
+        <% }); %>
+        </ul>
+
+        <form action="/todo/ajouter/" method="post">
+            <p>
+                <label for="newtodo">Que dois-je faire ?</label>
+                <input type="text" name="newtodo" id="newtodo" autofocus />
+                <input type="submit" />
+            </p>
+        </form>
+    </body>
+</html>
+
+<script>
+function Itemchange(){}
+</script>
+<!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+<!--#region Version "simple" qui fonctionne-->
+<!--
+<html>
+    <head>
+        <title>Ma todolist</title>
+        <style>
+            html {background-color: rgb(64, 64, 64); color: white; font-family: 'Segoe Print','Bookman';}
+            a {text-decoration: none; color: red;}
+            ul {list-style: none;}
+        </style>
+    </head>
+
+    <body>
+        <h1>Ma todolist</h1>
+
+        <ul>
+        <% todolist.forEach(function(todo, index) { %>
+            <li><a href="/todo/supprimer/<%= index %>">✘</a> <%= todo %></li>
+        <% }); %>
+        </ul>
+
+        <form action="/todo/ajouter/" method="post">
+            <p>
+                <label for="newtodo">Que dois-je faire ?</label>
+                <input type="text" name="newtodo" id="newtodo" autofocus />
+                <input type="submit" />
+            </p>
+        </form>
+    </body>
+</html>
+-->
+<!--#endregion-->
+<!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->

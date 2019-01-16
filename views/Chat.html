@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Chat</title>
+        <style>
+            html {background-color: rgb(64, 64, 64); 
+            color: white; 
+            font-family: 'Segoe Print','Bookman';
+            }
+            #zone_chat strong {
+                color: rgb(177, 26, 26);
+                padding: 2px;
+            }
+        </style>
+    </head>
+ 
+    <body>
+        <h1>Voici le chat que j'ai créé !</h1>
+
+        <form action="/" method="post" id="formulaire_chat">
+            <!--Textbox pour le message-->
+            <input type="text" name="message" id="message" placeholder="Votre message..." size="50" autofocus />
+            <!--Bouton pour envoyer-->
+            <input type="submit" id="envoi_message" value="Envoyer" />
+        </form>
+        <!--Ajout 2 : Changement de pseudo en cours de session-->
+        <form action="/" method="post" id="formulaire_pseudo">
+            <!--Textbox pour le nouveau pseudo-->
+            <input type="text" name="pseudo" id="pseudo" placeholder="Nouveau pseudo" size="50" autofocus />
+            <!--Bouton pour envoyer-->
+            <input type="submit" id="envoi_pseudo" value="Changer" />
+        </form>
+
+        <section id="zone_chat">
+            <!--Endroit où les maessages vont apparaitre
+            Remplit dans la fonction insereMessage-->            
+        </section>
+
+
+        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script> <!--Récupère l'event bouton click-->
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+
+            // Connexion à socket.io
+            var socket = io.connect('http://localhost:8080');
+
+            // On demande le pseudo, on l'envoie au serveur et on l'affiche dans le titre
+            var pseudo = prompt('Quel est votre pseudo ?');
+            socket.emit('nouveau_client', pseudo);
+            document.title = pseudo + ' - ' + document.title; //Affichage du pseudo devant le titre de la page sur l'onglet
+
+            // Quand on reçoit un message, on l'insère dans la page
+            socket.on('message', function(data) {
+                insereMessage(data.pseudo, data.message)
+            })
+
+            // Quand un nouveau client se connecte, on affiche l'information
+            socket.on('nouveau_client', function(pseudo) {
+                $('#zone_chat').prepend('<p><em>' + pseudo + ' a rejoint le Chat !</em></p>'); //Affichage dans la page avec un append vers le haut (d'où le pre)
+                //Passage à al aligne car <p>
+            })
+
+            // Lorsqu'on envoie le formulaire, on transmet le message et on l'affiche sur la page
+            $('#formulaire_chat').submit(function () {
+                var message = $('#message').val();
+                socket.emit('message', message); // Transmet le message aux autres
+                insereMessage(pseudo, message); // Affiche le message aussi sur notre page
+                $('#message').val('').focus(); // Vide la zone de Chat et remet le focus dessus
+                return false; // Permet de bloquer l'envoi "classique" du formulaire => Empêche de réafficher la page de base
+            });
+            
+            // Ajoute un message dans la page
+            function insereMessage(pseudo, message) {
+                $('#zone_chat').prepend('<p><strong>' + pseudo + '</strong> ' + message + '</p>');
+            }
+            
+            //Ajout 1 : message lors de la déconnexion
+            socket.on('deconnexion', function(pseudo) {
+                $('#zone_chat').prepend('<p><em>' + pseudo + ' a quitté le Chat !</em></p>');
+            })
+//Ne fonctionne pas
+            //Ajout 2 : Changement de pseudo en cours de session
+            // Lorsqu'on envoie le formulaire, on transmet le pseudo
+            $('#formulaire_pseudo').submit(function () {
+                var pseudo2 = $('#pseudo').val();
+                socket.emit('pseudo', pseudo2); // Transmet le message aux autres
+                $('#zone_chat').prepend('<p><em>' + pseudo + ' a changé de pseudo pour : ' + pseudo2 + ' !</em></p>'); // Affiche le changement aussi sur notre page
+                $('#pseudo').val(''); // Vide la zone de Chat
+                return false; // Permet de bloquer l'envoi "classique" du formulaire => Empêche de réafficher la page de base
+            });
+
+            socket.on('nouveau_pseudo', function(pseudo, pseudo2) {
+                $('#zone_chat').prepend('<p><em>' + pseudo + ' a changé de pseudo pour : ' + pseudo2 + ' !</em></p>'); // Affiche le changement aussi sur notre page
+            })
+        </script>
+    </body>
+</html>
+
+<!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+<!--#region Version "simple" qui fonctionne-->
+<!--
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Chat</title>
+        <style>
+            html {background-color: rgb(64, 64, 64); 
+            color: white; 
+            font-family: 'Segoe Print','Bookman';
+            }
+            #zone_chat strong {
+                color: rgb(177, 26, 26);
+                padding: 2px;
+            }
+        </style>
+    </head>
+ 
+    <body>
+        <h1>Voici le chat que j'ai créé !</h1>
+
+        <form action="/" method="post" id="formulaire_chat">
+            //Textbox pour le message
+            <input type="text" name="message" id="message" placeholder="Votre message..." size="50" autofocus />
+            //Bouton pour envoyer
+            <input type="submit" id="envoi_message" value="Envoyer" />
+        </form>
+
+        <section id="zone_chat">
+            /*Endroit où les maessages vont apparaitre
+            Remplit dans la fonction insereMessage*/            
+        </section>
+
+
+        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script> //Récupère l'event bouton click
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+
+            // Connexion à socket.io
+            var socket = io.connect('http://localhost:8080');
+
+            // On demande le pseudo, on l'envoie au serveur et on l'affiche dans le titre
+            var pseudo = prompt('Quel est votre pseudo ?');
+            socket.emit('nouveau_client', pseudo);
+            document.title = pseudo + ' - ' + document.title; //Affichage du pseudo devant le titre de la page sur l'onglet
+
+            // Quand on reçoit un message, on l'insère dans la page
+            socket.on('message', function(data) {
+                insereMessage(data.pseudo, data.message)
+            })
+
+            // Quand un nouveau client se connecte, on affiche l'information
+            socket.on('nouveau_client', function(pseudo) {
+                $('#zone_chat').prepend('<p><em>' + pseudo + ' a rejoint le Chat !</em></p>'); //Affichage dans la page avec un append vers le haut (d'où le pre)
+                //Passage à al aligne car <p>
+            })
+
+            // Lorsqu'on envoie le formulaire, on transmet le message et on l'affiche sur la page
+            $('#formulaire_chat').submit(function () {
+                var message = $('#message').val();
+                socket.emit('message', message); // Transmet le message aux autres
+                insereMessage(pseudo, message); // Affiche le message aussi sur notre page
+                $('#message').val('').focus(); // Vide la zone de Chat et remet le focus dessus
+                return false; // Permet de bloquer l'envoi "classique" du formulaire => Empêche de réafficher la page de base
+            });
+            
+            // Ajoute un message dans la page
+            function insereMessage(pseudo, message) {
+                $('#zone_chat').prepend('<p><strong>' + pseudo + '</strong> ' + message + '</p>');
+            }
+        </script>
+    </body>
+</html>
+-->
+<!--#endregion-->
+<!----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->

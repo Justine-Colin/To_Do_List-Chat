@@ -1,0 +1,12 @@
+{
+    "name": "To_Do_List",
+    "version": "0.1.0",
+    "dependencies": {
+        "express": "~4.16.4",
+        "ejs": "~2.6.1",
+        "cookie-session": "~2.0.0",
+        "body-parser": "~1.18.3"
+    },
+    "author": "Justine Colin",
+    "description": "To do list pour l'exam"
+}
